@@ -1,0 +1,45 @@
+{
+	"groups": [
+		{
+			"keys": "bg_jpg,egret_icon_png,description_json,giant_png,death_png,ghost_png,shootBtn_png",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"name": "bg_jpg",
+			"type": "image",
+			"url": "assets/bg.jpg"
+		},
+		{
+			"name": "egret_icon_png",
+			"type": "image",
+			"url": "assets/egret_icon.png"
+		},
+		{
+			"name": "description_json",
+			"type": "json",
+			"url": "config/description.json"
+		},
+		{
+			"name": "giant_png",
+			"type": "image",
+			"url": "assets/giant.png"
+		},
+		{
+			"name": "death_png",
+			"type": "image",
+			"url": "assets/death.png"
+		},
+		{
+			"name": "ghost_png",
+			"type": "image",
+			"url": "assets/ghost.png"
+		},
+		{
+			"name": "shootBtn_png",
+			"type": "image",
+			"url": "assets/shootBtn.png"
+		}
+	]
+}
