@@ -8,10 +8,7 @@
 		"libs/modules/promise/promise.js"
 	],
 	"game": [
-		"bin-debug/Role.js",
 		"bin-debug/ActDisplayObject.js",
-		"bin-debug/Ghost.js",
-		"bin-debug/Giant.js",
 		"bin-debug/LoadingUI.js",
 		"bin-debug/Main.js",
 		"bin-debug/ObjectDecorator.js",

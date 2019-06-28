@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "description_json",
+			"keys": "description_json,rotate_png",
 			"name": "preload"
 		}
 	],
@@ -10,6 +10,11 @@
 			"name": "description_json",
 			"type": "json",
 			"url": "config/description.json"
+		},
+		{
+			"name": "rotate_png",
+			"type": "image",
+			"url": "assets/rotate.png"
 		}
 	]
 }

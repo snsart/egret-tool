@@ -93,8 +93,38 @@ class Main extends egret.DisplayObjectContainer {
      * Create a game scene
      */
     private createGameScene() {
-      
+        let bg:egret.Shape=new egret.Shape();
+        let g=bg.graphics;
+        g.beginFill(0xffffff);
+        g.drawRoundRect(0,0,this.stage.stageWidth,this.stage.stageHeight,15,15);
+        this.addChild(bg);
+
+        let dragObj:egret.Shape=new egret.Shape();
+        dragObj.graphics.beginFill(0xff0000);
+        dragObj.graphics.drawRect(0,0,100,100);
+        dragObj.anchorOffsetX=dragObj.width/2;
+        dragObj.anchorOffsetY=dragObj.height/2
+        this.addChild(dragObj);
+        ObjectDecorator.get(dragObj).addDragAction(this.stage,new egret.Rectangle(0,0,this.stage.stageWidth-dragObj.width,this.stage.stageHeight-dragObj.height)).upHandler(function(){
+            this.obj.x=100;
+            this.obj.y=100;
+        });
+
+        let rotate=this.createBitmapByName("rotate_png");
+        rotate.anchorOffsetX=rotate.width/2;
+        rotate.anchorOffsetY=rotate.height/2
+        this.addChild(rotate);
+        ObjectDecorator.get(dragObj).addRotateAction(this.stage,rotate,150,-90);
+
        
+    }
+
+    
+    private createBitmapByName(name: string) {
+        let result = new egret.Bitmap();
+        let texture: egret.Texture = RES.getRes(name);
+        result.texture = texture;
+        return result;
     }
 
 }

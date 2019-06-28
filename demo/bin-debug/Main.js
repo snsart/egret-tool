@@ -75,8 +75,6 @@ var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         var _this = _super.call(this) || this;
-        _this.mates = []; //存储巨人-鬼对
-        _this.roles = [];
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddToStage, _this);
         return _this;
     }
@@ -152,158 +150,28 @@ var Main = (function (_super) {
      */
     Main.prototype.createGameScene = function () {
         var bg = new egret.Shape();
-        bg.graphics.beginFill(0x000000);
-        bg.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+        var g = bg.graphics;
+        g.beginFill(0xffffff);
+        g.drawRoundRect(0, 0, this.stage.stageWidth, this.stage.stageHeight, 15, 15);
         this.addChild(bg);
-        this.lineShape = new egret.Shape();
-        this.lineShape.filters = [new egret.GlowFilter(0x0000ff, 0.1, 20, 20, 50)];
-        this.addChild(this.lineShape);
-        this.createRoles(10);
-        var shootBtn = this.createBitmapByName("shootBtn_png");
-        this.addChild(shootBtn);
-        shootBtn.width = 200;
-        shootBtn.height = 200;
-        shootBtn.anchorOffsetX = shootBtn.width / 2;
-        shootBtn.anchorOffsetY = shootBtn.height / 2;
-        shootBtn.x = this.stage.stageWidth / 2;
-        shootBtn.y = this.stage.stageHeight - shootBtn.height / 2;
-        shootBtn.touchEnabled = true;
-        shootBtn.addEventListener(egret.TouchEvent.TOUCH_BEGIN, function () {
-            this.startShoot();
-        }, this);
-        this.stage.addEventListener(egret.TouchEvent.TOUCH_END, function () {
-            this.stopShoot();
-        }, this);
+        var dragObj = new egret.Shape();
+        dragObj.graphics.beginFill(0xff0000);
+        dragObj.graphics.drawRect(0, 0, 100, 100);
+        dragObj.anchorOffsetX = dragObj.width / 2;
+        dragObj.anchorOffsetY = dragObj.height / 2;
+        this.addChild(dragObj);
+        ObjectDecorator.get(dragObj).addDragAction(this.stage, new egret.Rectangle(0, 0, this.stage.stageWidth - dragObj.width, this.stage.stageHeight - dragObj.height)).upHandler(function () {
+            this.x = 100;
+            this.y = 100;
+        });
+        var rotate = this.createBitmapByName("rotate_png");
+        rotate.anchorOffsetX = rotate.width / 2;
+        rotate.anchorOffsetY = rotate.height / 2;
+        this.addChild(rotate);
+        ObjectDecorator.get(dragObj).addRotateAction(this.stage, rotate, 150, -90).moveHandler(function () {
+            console.log("moving");
+        });
     };
-    Main.prototype.createRoles = function (num) {
-        for (var i = 0; i < num; i++) {
-            var ghost = new Ghost();
-            ghost.x = Math.random() * this.stage.stageWidth;
-            ghost.y = Math.random() * (this.stage.stageHeight - 200);
-            ObjectDecorator.get(ghost).addDragAction(this.stage);
-            this.addChild(ghost);
-            var giant = new Giant();
-            giant.x = Math.random() * this.stage.stageWidth;
-            giant.y = Math.random() * (this.stage.stageHeight - 200);
-            ObjectDecorator.get(giant).addDragAction(this.stage);
-            this.addChild(giant);
-            this.roles.push(ghost, giant);
-        }
-    };
-    Main.prototype.stopShoot = function () {
-        var g = this.lineShape.graphics;
-        g.clear();
-        for (var i = 0; i < this.roles.length; i++) {
-            if (this.roles[i].type == Role.GHOSR_TYPE) {
-                this.roles[i].live();
-            }
-        }
-    };
-    Main.prototype.startShoot = function () {
-        var g = this.lineShape.graphics;
-        g.clear();
-        g.lineStyle(1, 0x9099ff);
-        //shape.graphics.beginFill(fillColor);
-        for (var i = 0; i < this.roles.length; i++) {
-            if (this.roles[i].type == Role.GHOSR_TYPE) {
-                console.log(this.roles[i]);
-                this.roles[i].die();
-            }
-        }
-        var mates = this.mates = [];
-        this.getmates(this.roles);
-        for (var i = 0, len = mates.length; i < len; i++) {
-            g.moveTo(mates[i][0].x, mates[i][0].y);
-            g.lineTo(mates[i][1].x, mates[i][1].y);
-        }
-    };
-    //求巨人-鬼对
-    Main.prototype.getmates = function (points) {
-        if (points.length == 0) {
-            return;
-        }
-        var mates = this.mates;
-        var startPoint = this.startPoint = this.getStartPoint(points);
-        var lefts = [];
-        var rights = [];
-        var m = 0, n = 0; //lefts中巨人和小鬼的数量
-        points.sort(this.compare.bind(this));
-        var type = startPoint.type, len = points.length;
-        for (var i = 1; i < len; i++) {
-            if (points[i].type == type) {
-                lefts.push(points[i]);
-                m++;
-            }
-            else if (points[i].type != type && m != n) {
-                lefts.push(points[i]);
-                n++;
-            }
-            else {
-                mates.push([startPoint, points[i]]);
-                this.getmates(lefts);
-                for (var j = i + 1; j < len; j++) {
-                    rights.push(points[j]);
-                }
-                this.getmates(rights);
-                break;
-            }
-        }
-    };
-    //各点按极坐标的角度排序,若极坐标一样按x坐标排序,若x坐标一样按y排序；
-    Main.prototype.compare = function (value1, value2) {
-        console.log(this.getPolarAngle);
-        var value1Angle = this.getPolarAngle(this.startPoint, value1);
-        var value2Angle = this.getPolarAngle(this.startPoint, value2);
-        console.log(value1Angle);
-        if (value1Angle < value2Angle) {
-            return -1;
-        }
-        else if (value1Angle > value2Angle) {
-            return 1;
-        }
-        else {
-            if (value1.x < value2.x) {
-                return -1;
-            }
-            else if (value1.x > value2.x) {
-                return 1;
-            }
-            else {
-                if (value1.y < value2.y) {
-                    return 1;
-                }
-                else if (value1.y > value2.y) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }
-        }
-    };
-    //选出y轴最小的点startPoint
-    Main.prototype.getStartPoint = function (points) {
-        var startPoint = points[0];
-        for (var i = 1, len = points.length; i < len; i++) {
-            if (points[i].y < startPoint.y) {
-                startPoint = points[i];
-            }
-            else if (points[i].y == startPoint.y) {
-                if (points[i].x < startPoint.x) {
-                    startPoint = points[i];
-                }
-            }
-        }
-        return startPoint;
-    };
-    //得到向量极坐标的角度，p1和p2为向量的起点和终点
-    Main.prototype.getPolarAngle = function (p1, p2) {
-        return Math.atan2(p2.y - p1.y, p2.x - p1.x);
-    };
-    /**
-     * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
-     * Create a Bitmap object according to name keyword.As for the property of name please refer to the configuration file of resources/resource.json.
-     */
     Main.prototype.createBitmapByName = function (name) {
         var result = new egret.Bitmap();
         var texture = RES.getRes(name);
